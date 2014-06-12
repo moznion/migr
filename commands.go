@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 
 var Commands = []cli.Command{
 	commandGen,
+	commandList,
 }
 
 var commandGen = cli.Command{
@@ -19,6 +21,14 @@ var commandGen = cli.Command{
 	Usage:       "TODO",
 	Description: "TODO",
 	Action:      generate,
+	Flags:       []cli.Flag{},
+}
+
+var commandList = cli.Command{
+	Name:        "list",
+	Usage:       "TODO",
+	Description: "TODO",
+	Action:      list,
 	Flags:       []cli.Flag{},
 }
 
@@ -53,5 +63,24 @@ func generate(c *cli.Context) {
 	if err != nil {
 		// TODO
 		os.Exit(1)
+	}
+}
+
+func list(c *cli.Context) {
+	args := c.Args()
+	branchName := args.Get(0)
+	path := args.Get(1)
+	if path == "" {
+		path = "./"
+	}
+	files, err := filepath.Glob(path + "/" + branchName + "~*")
+
+	if err != nil {
+		// TODO
+		os.Exit(1)
+	}
+
+	for _, file := range files {
+		fmt.Println(file)
 	}
 }
