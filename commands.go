@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 var Commands = []cli.Command{
 	commandGen,
 	commandList,
+	commandConcat,
 }
 
 var commandGen = cli.Command{
@@ -29,6 +31,14 @@ var commandList = cli.Command{
 	Usage:       "TODO",
 	Description: "TODO",
 	Action:      list,
+	Flags:       []cli.Flag{},
+}
+
+var commandConcat = cli.Command{
+	Name:        "concat",
+	Usage:       "TODO",
+	Description: "TODO",
+	Action:      concat,
 	Flags:       []cli.Flag{},
 }
 
@@ -70,9 +80,37 @@ func list(c *cli.Context) {
 	args := c.Args()
 	branchName := args.Get(0)
 	path := args.Get(1)
+	files := getMigrationSchemaFilesList(path, branchName)
+
+	for _, file := range files {
+		fmt.Println(file)
+	}
+}
+
+func concat(c *cli.Context) {
+	args := c.Args()
+	branchName := args.Get(0)
+	path := args.Get(1)
+	files := getMigrationSchemaFilesList(path, branchName)
+
+	var sqlStatement string
+	for _, file := range files {
+		buf, err := ioutil.ReadFile(file)
+		if err != nil {
+			// TODO
+			os.Exit(1)
+		}
+		sqlStatement += string(buf) + "\n"
+	}
+
+	fmt.Println(sqlStatement)
+}
+
+func getMigrationSchemaFilesList(path, branchName string) []string {
 	if path == "" {
 		path = "./"
 	}
+
 	files, err := filepath.Glob(path + "/" + branchName + "~*")
 
 	if err != nil {
@@ -80,7 +118,6 @@ func list(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	for _, file := range files {
-		fmt.Println(file)
-	}
+	sort.Strings(files)
+	return files
 }
