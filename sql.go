@@ -23,7 +23,7 @@ func buildCreateSQL(tableName string) string {
 
 func buildAlterSQL(tableName string) string {
 	statement := ""
-	statement += fmt.Sprintf("ALTER TABLE `%s`;", tableName)
+	statement += fmt.Sprintf("ALTER TABLE `%s` ;", tableName)
 	return statement
 }
 
